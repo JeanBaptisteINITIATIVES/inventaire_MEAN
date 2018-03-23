@@ -1,0 +1,61 @@
+<h2>Saisie libre de produit :</h2>
+<form [formGroup]="freeForm" (ngSubmit)="createFreeEntry(freeForm.value)" *ngIf="active" novalidate>
+	<div fxLayout="row" fxLayoutAlign="start start" fxLayout.lt-md="column">
+		<mat-form-field fxFlex="15%" id="loc">
+			<input matInput placeholder="Emplacement" [matAutocomplete]="autoFreeLoc" formControlName="location" [appFocus]="(focus === 'freeLoc')"
+			 required>
+			<mat-autocomplete #autoFreeLoc="matAutocomplete" (optionSelected)="onFreeLocSelectionChanged($event)">
+				<mat-option *ngFor="let loc of filteredLocation$ | async" [value]="loc.num_location">
+					<span>{{ loc.num_location }}</span>
+				</mat-option>
+			</mat-autocomplete>
+			<mat-error *ngIf="freeForm.get('location').hasError('required')">Emplacement requis</mat-error>
+			<mat-error *ngIf="freeForm.get('location').hasError('locNotExists')">Emplacement inconnu</mat-error>
+		</mat-form-field>
+
+		<mat-form-field fxFlex="35%">
+			<input matInput placeholder="Référence" [matAutocomplete]="autoFreeRef" formControlName="reference" [appFocus]="(focus === 'freeRef')">
+			<mat-autocomplete #autoFreeRef="matAutocomplete" (optionSelected)="onFreeRefSelectionChanged($event)">
+				<mat-option *ngFor="let ref of filteredFreeReference$ | async" [value]="ref.id">
+					<span>{{ ref.id }} - {{ ref.name }}</span>
+				</mat-option>
+			</mat-autocomplete>
+		</mat-form-field>
+
+		<mat-form-field fxFlex="48%">
+			<input matInput placeholder="Désignation" [matAutocomplete]="autoFreeDes" formControlName="designation" [appFocus]="(focus === 'freeDes')"
+			 required>
+			<mat-autocomplete #autoFreeDes="matAutocomplete" (optionSelected)="onFreeDesSelectionChanged($event)">
+				<mat-option *ngFor="let des of filteredFreeDesignation$ | async" [value]="des.name">
+					<span>{{ des.id }} - {{ des.name }}</span>
+				</mat-option>
+			</mat-autocomplete>
+			<mat-error *ngIf="freeForm.get('designation').hasError('required')">Désignation requise</mat-error>
+		</mat-form-field>
+	</div>
+
+	<div class="row-input" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="5%" fxLayout.lt-md="column">
+		<mat-form-field fxFlex="15%">
+			<input matInput placeholder="Quantité" formControlName="quantity" autocomplete="off" [appFocus]="(focus === 'freeQty')" required>
+			<mat-error *ngIf="freeForm.get('quantity').hasError('required')">Quantité requise</mat-error>
+			<mat-error *ngIf="freeForm.get('quantity').hasError('pattern')">Erreur sur la quantité</mat-error>
+		</mat-form-field>
+
+		<mat-form-field fxFlex="15%">
+			<mat-select placeholder="Statut" formControlName="status">
+				<mat-option value="A">A</mat-option>
+				<mat-option value="Q">Q</mat-option>
+				<mat-option value="R">R</mat-option>
+			</mat-select>
+		</mat-form-field>
+
+		<mat-form-field fxFlex="60%">
+			<input matInput placeholder="Commentaire" formControlName="commentary">
+		</mat-form-field>
+	</div>
+
+	<div class="row-input" fxLayout="row" fxLayoutAlign="end">
+		<button type="submit" [disabled]="freeForm.invalid" (click)="setFocus('freeLoc')" mat-raised-button color="primary">{{ verb }}</button>
+		<button *ngIf="isInEditMode" id="cancel-button" mat-raised-button color="accent" type="button" (click)="cancelEdit()">Annuler</button>
+	</div>
+</form>

@@ -1,0 +1,89 @@
+.table-stock
+{
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+
+.mat-table
+{
+  overflow: auto;
+  max-height: 38em;
+}
+
+.table-header
+{
+  min-height: 4em;
+  padding: 1em 3em 0;
+}
+
+.mat-header-row, .mat-row
+{
+	padding: 0 0.5em;
+	cursor: pointer;
+}
+
+mat-cell
+{
+	display: flex !important;
+	justify-content: center !important;
+	font-size: 0.87em;
+}
+
+mat-header-cell
+{
+	display: flex;
+	justify-content: center;
+	font-size: 0.75em;
+}
+
+.mat-form-field
+{
+	font-size: 0.9em;
+	width: 100%;
+}
+
+.mat-column-location,  .mat-column-reference, .mat-column-designation, .mat-column-quantity, .mat-column-status, .mat-column-commentary, .mat-column-date_entry
+{
+	text-align: center;
+}
+
+.mat-column-location
+{
+	flex: 1 1 10%;
+}
+
+.mat-column-reference
+{
+	flex: 1 1 10%;
+}
+
+.mat-column-designation
+{
+	flex: 1 1 30%;
+}
+
+.mat-column-quantity
+{
+	flex: 1 1 8%;
+}
+
+.mat-column-status
+{
+	flex: 1 1 7%;
+}
+
+.mat-column-commentary
+{
+	flex: 1 1 15%;
+}
+
+.mat-column-date_entry
+{
+	flex: 1 1 20%;
+}
+
+.mat-column-select
+{
+  	overflow: visible;
+}

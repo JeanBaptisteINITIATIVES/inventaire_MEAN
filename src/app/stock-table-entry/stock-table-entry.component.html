@@ -1,0 +1,66 @@
+<h2>Liste produits suivis en stock :</h2>
+<div class="table-header">
+	<mat-form-field>
+		<input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filtre">
+	</mat-form-field>
+</div>
+<div class="table-stock mat-elevation-z8">
+	<mat-table #table
+			   [dataSource]="dataSource"
+			   matSort
+			   matSortActive="date_entry"
+			   matSortDisableClear
+			   matSortDirection="desc">
+		<ng-container matColumnDef="select">
+			<mat-header-cell *matHeaderCellDef>test</mat-header-cell>
+			<mat-cell *matCellDef="let row">
+				<mat-checkbox (click)="$event.stopPropagation()"
+							  (change)="$event ? selection.toggle(row) : null"
+							  [checked]="selection.isSelected(row)">
+				</mat-checkbox>
+			</mat-cell>
+		</ng-container>
+		<ng-container matColumnDef="location">
+			<mat-header-cell *matHeaderCellDef mat-sort-header> Emplacement </mat-header-cell>
+			<mat-cell *matCellDef="let row"> {{ row.location }} </mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="reference">
+			<mat-header-cell *matHeaderCellDef mat-sort-header> Référence </mat-header-cell>
+			<mat-cell *matCellDef="let row"> {{ row.reference }} </mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="designation">
+			<mat-header-cell *matHeaderCellDef mat-sort-header> Désignation </mat-header-cell>
+			<mat-cell *matCellDef="let row"> {{ row.designation }} </mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="quantity">
+			<mat-header-cell *matHeaderCellDef> Quantité </mat-header-cell>
+			<mat-cell *matCellDef="let row"> {{ row.quantity }} </mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="status">
+			<mat-header-cell *matHeaderCellDef> Statut </mat-header-cell>
+			<mat-cell *matCellDef="let row"> {{ row.status }} </mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="commentary">
+			<mat-header-cell *matHeaderCellDef> Commentaire </mat-header-cell>
+			<mat-cell *matCellDef="let row"> {{ row.commentary }} </mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="date_entry">
+			<mat-header-cell *matHeaderCellDef mat-sort-header> Date saisie </mat-header-cell>
+			<mat-cell *matCellDef="let row"> {{ row.date_entry }} </mat-cell>
+		</ng-container>
+
+		<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+		<mat-row *matRowDef="let row; columns: displayedColumns;"
+				 (click)="toggleToEditMode(row)">
+		</mat-row>
+	</mat-table>
+
+	<mat-paginator #paginator [pageSize]="20" [pageSizeOptions]="[5, 10, 20, 50, 100]">
+	</mat-paginator>
+</div>

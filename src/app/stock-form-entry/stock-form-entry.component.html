@@ -1,0 +1,65 @@
+<h2>Saisie produit suivi en stock :</h2>
+<form [formGroup]="stockForm" (ngSubmit)="createStockEntry(stockForm.value)" *ngIf="active" novalidate>
+	<div fxLayout="row" fxLayoutAlign="start start" fxLayout.lt-md="column" fxLayoutAlign.lt-md="start stretch">
+		<mat-form-field fxFlex="15%" id="loc">
+			<input matInput placeholder="Emplacement" [matAutocomplete]="autoLoc" formControlName="location" [appFocus]="(focus === 'loc')"
+				required>
+			<mat-autocomplete #autoLoc="matAutocomplete" (optionSelected)="onLocSelectionChanged($event)">
+				<mat-option *ngFor="let loc of filteredLocation$ | async" [value]="loc.num_location">
+					<span>{{ loc.num_location }}</span>
+				</mat-option>
+			</mat-autocomplete>
+			<mat-error *ngIf="stockForm.get('location').hasError('required')">Emplacement requis</mat-error>
+			<mat-error *ngIf="stockForm.get('location').hasError('locNotExists')">Emplacement inconnu</mat-error>
+		</mat-form-field>
+
+		<mat-form-field fxFlex="35%">
+			<input matInput placeholder="Référence" [matAutocomplete]="autoRef" formControlName="reference" [appFocus]="(focus === 'ref')"
+				required>
+			<mat-autocomplete #autoRef="matAutocomplete" (optionSelected)="onRefSelectionChanged($event)">
+				<mat-option *ngFor="let ref of filteredReference$ | async" [value]="ref.id">
+					<span>{{ ref.id }} - {{ ref.name }}</span>
+				</mat-option>
+			</mat-autocomplete>
+			<mat-error *ngIf="stockForm.get('reference').hasError('required')">Référence requise</mat-error>
+			<mat-error *ngIf="stockForm.get('reference').hasError('refNotExists')">Référence inconnue</mat-error>
+		</mat-form-field>
+		
+		<mat-form-field fxFlex="48%">
+			<input matInput placeholder="Désignation" [matAutocomplete]="autoDes" formControlName="designation" [appFocus]="(focus === 'des')"
+				required>
+			<mat-autocomplete #autoDes="matAutocomplete" (optionSelected)="onDesSelectionChanged($event)">
+				<mat-option *ngFor="let des of filteredDesignation$ | async" [value]="des.name">
+					<span>{{ des.id }} - {{ des.name }}</span>
+				</mat-option>
+			</mat-autocomplete>
+			<mat-error *ngIf="stockForm.get('designation').hasError('required')">Désignation requise</mat-error>
+			<mat-error *ngIf="stockForm.get('designation').hasError('desNotExists')">Désignation inconnue</mat-error>
+		</mat-form-field>
+	</div>
+
+	<div class="row-input" fxLayout="row" fxLayoutGap="5%" fxLayoutAlign="start start" fxLayout.lt-md="column" fxLayoutAlign.lt-md="start stretch">
+		<mat-form-field fxFlex="15%">
+			<input matInput placeholder="Quantité" formControlName="quantity" autocomplete="off" [appFocus]="(focus === 'qty')" required>
+			<mat-error *ngIf="stockForm.get('quantity').hasError('required')">Quantité requise</mat-error>
+			<mat-error *ngIf="stockForm.get('quantity').hasError('pattern')">Erreur sur la quantité</mat-error>
+		</mat-form-field>
+
+		<mat-form-field fxFlex="10%">
+			<mat-select placeholder="Statut" formControlName="status">
+				<mat-option value="A">A</mat-option>
+				<mat-option value="Q">Q</mat-option>
+				<mat-option value="R">R</mat-option>
+			</mat-select>
+		</mat-form-field>
+
+		<mat-form-field fxFlex="65%">
+			<input matInput placeholder="Commentaire" formControlName="commentary">
+		</mat-form-field>
+	</div>
+
+	<div class="row-input" fxLayout="row" fxLayoutAlign="end">
+		<button type="submit" [disabled]="stockForm.invalid" (click)="setFocus('loc')" mat-raised-button color="primary">{{ verb }}</button>
+		<button *ngIf="isInEditMode" id="cancel-button" mat-raised-button color="accent" type="button" (click)="cancelEdit()">Annuler</button>
+	</div>
+</form>
