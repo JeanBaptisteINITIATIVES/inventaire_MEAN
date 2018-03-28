@@ -1,5 +1,5 @@
 <h2>Saisie libre de produit :</h2>
-<form [formGroup]="freeForm" (ngSubmit)="createFreeEntry(freeForm.value)" *ngIf="active" novalidate>
+<form [formGroup]="freeForm" (ngSubmit)="saveFreeEntry(freeForm.value)" *ngIf="active" novalidate>
 	<div fxLayout="row" fxLayoutAlign="start start" fxLayout.lt-md="column">
 		<mat-form-field fxFlex="15%" id="loc">
 			<input matInput placeholder="Emplacement" [matAutocomplete]="autoFreeLoc" formControlName="location" [appFocus]="(focus === 'freeLoc')"
@@ -56,6 +56,7 @@
 
 	<div class="row-input" fxLayout="row" fxLayoutAlign="end">
 		<button type="submit" [disabled]="freeForm.invalid" (click)="setFocus('freeLoc')" mat-raised-button color="primary">{{ verb }}</button>
-		<button *ngIf="isInEditMode" id="cancel-button" mat-raised-button color="accent" type="button" (click)="cancelEdit()">Annuler</button>
+		<button *ngIf="isInEditMode" id="delete-button" mat-raised-button color="warn" type="button" (click)="deleteEdit(freeForm.value)">Supprimer</button>
+		<button *ngIf="isInEditMode" id="cancel-button" mat-raised-button type="button" (click)="cancelEdit()">Annuler</button>
 	</div>
 </form>

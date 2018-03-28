@@ -1,5 +1,5 @@
 <h2>Saisie produit suivi en stock :</h2>
-<form [formGroup]="stockForm" (ngSubmit)="createStockEntry(stockForm.value)" *ngIf="active" novalidate>
+<form [formGroup]="stockForm" (ngSubmit)="saveStockEntry(stockForm.value)" *ngIf="active" novalidate>
 	<div fxLayout="row" fxLayoutAlign="start start" fxLayout.lt-md="column" fxLayoutAlign.lt-md="start stretch">
 		<mat-form-field fxFlex="15%" id="loc">
 			<input matInput placeholder="Emplacement" [matAutocomplete]="autoLoc" formControlName="location" [appFocus]="(focus === 'loc')"
@@ -60,6 +60,8 @@
 
 	<div class="row-input" fxLayout="row" fxLayoutAlign="end">
 		<button type="submit" [disabled]="stockForm.invalid" (click)="setFocus('loc')" mat-raised-button color="primary">{{ verb }}</button>
-		<button *ngIf="isInEditMode" id="cancel-button" mat-raised-button color="accent" type="button" (click)="cancelEdit()">Annuler</button>
+		<button *ngIf="isInEditMode" id="delete-button" mat-raised-button color="warn" type="button" (click)="deleteEdit(stockForm.value)">Supprimer</button>
+		<button *ngIf="isInEditMode" id="cancel-button" mat-raised-button type="button" (click)="cancelEdit()">Annuler</button>
+
 	</div>
 </form>

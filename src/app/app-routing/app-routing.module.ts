@@ -6,6 +6,7 @@ import { HomeEntryComponent } from "../home-entry/home-entry.component";
 const routes: Routes = [
 	{ path: '', redirectTo: 'home-entry', pathMatch: 'full' },
 	{ path: '**', component: HomeEntryComponent }
+	// { path: 'stock-entry/:id', component: HomeEntryComponent }
 ];
 
 @NgModule({

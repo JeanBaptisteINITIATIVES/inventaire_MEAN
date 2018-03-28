@@ -53,9 +53,40 @@ export class FreeTableEntryComponent implements OnInit {
 		this.dataSource = new MatTableDataSource(this.freeEntries);
 
 		// On s'abonne au subject qui pousse un ajout d'entrée via formulaire
-		this.formEntryService.freeEntrySubject.subscribe(data => {
+		this.formEntryService.freeAddSubject.subscribe(data => {
 			console.log('Entrée non-suivie ajoutée', data);
 			this.dataSource.data = [data, ...this.dataSource.data];
+			console.log('Entrées non-suivies existantes', this.dataSource.data);
+		});
+
+		// On s'abonne pour l'édition d'une entrée
+		this.formEntryService.freeEditSubject.subscribe(data => {
+			console.log('Entrée non-suivie modifiée', data);
+			// let entryIndex = this.dataSource.data.findIndex(item => item.id == (data as Entry).id);
+			// this.dataSource.data[entryIndex] = data;
+			// this.dataSource.data = this.dataSource.data;
+			this.tableEntryService.getFreeEntries().subscribe(
+				data => {
+					this.freeEntries = data;
+					this.dataSource.data = data;
+					console.log('Entrées non-suivies existantes', this.dataSource.data);
+				}
+			);
+		});
+
+		// On s'abonne pour la suppression d'une entrée
+		this.formEntryService.freeDeleteSubject.subscribe(data => {
+			console.log('Entrée stock supprimée', data);
+			// let entryIndex = this.dataSource.data.findIndex(item => item.id == (data as Entry).id);
+			// this.dataSource.data.splice(this.dataSource.data[entryIndex], 1);
+			// this.dataSource.data = this.dataSource.data;
+			this.tableEntryService.getFreeEntries().subscribe(
+				data => {
+					this.freeEntries = data;
+					this.dataSource.data = data;
+					console.log('Entrées non-suivies existantes', this.dataSource.data);
+				}
+			);
 		});
 
 		// Si l'utilisateur change l'ordre d'une colomne, revient à la 1ère page
@@ -73,5 +104,11 @@ export class FreeTableEntryComponent implements OnInit {
 		filterValue = filterValue.trim();
 		filterValue = filterValue.toLowerCase();
 		this.dataSource.filter = filterValue;
+	}
+
+	// Méthode pour édition entrée
+	toggleToEditMode(entry) {
+		this.selection.toggle(entry);
+		this.tableEntryService.editFreeEntry(entry);
 	}
 }

@@ -1,5 +1,5 @@
 export interface Entry {
-	id: number;
+	id?: number;
 	location: string;
 	reference: string;
 	designation: string;

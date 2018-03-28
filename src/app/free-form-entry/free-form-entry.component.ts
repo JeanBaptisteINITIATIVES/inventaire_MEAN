@@ -6,6 +6,8 @@ import { map } from 'rxjs/operators/map';
 import { MatAutocompleteSelectedEvent } from "@angular/material";
 
 import { FormEntryService } from "../services/form-entry.service";
+import { TableEntryService } from "../services/table-entry.service";
+
 import { LocValidator } from "../validators/loc-validator";
 import { Entry } from "../../entry";
 
@@ -19,8 +21,9 @@ export class FreeFormEntryComponent implements OnInit {
 	freeForm: FormGroup;
 	options: FormGroup;
 
-	products: any[] = [];
+	untrackedProducts: any[] = [];
 	locations: any[] = [];
+	// filteredProducts;
 
 	isInEditMode: boolean = false;
 	verb: string = 'Ajouter';
@@ -34,7 +37,7 @@ export class FreeFormEntryComponent implements OnInit {
 	filteredFreeReference$: Observable<any[]>;
 	filteredFreeDesignation$: Observable<any[]>;
 
-	constructor(private formBuilder: FormBuilder, private formEntryService: FormEntryService) { }
+	constructor(private formBuilder: FormBuilder, private formEntryService: FormEntryService, private tableEntryService: TableEntryService) { }
 
 	ngOnInit() {
 		// initialisation du formulaire
@@ -49,7 +52,7 @@ export class FreeFormEntryComponent implements OnInit {
 		this.formEntryService.getUntrackedProducts()
 			.subscribe(
 				data => {
-					this.products = data;
+					this.untrackedProducts = data;
 					// console.log('Untracked products', data);
 				},
 				error => {
@@ -71,6 +74,22 @@ export class FreeFormEntryComponent implements OnInit {
 					this.error = error;
 				}
 			);
+
+		// On récupère l'entrée à éditer
+		this.tableEntryService.editFreeEntrySubject.subscribe(data => {
+			this.isInEditMode = true;
+			this.verb = 'Modifier';
+			console.log('Entrée à modifier ou supprimer', data);
+			this.freeForm.get('id').patchValue((data as Entry).id);
+			this.freeForm.get('location').patchValue((data as Entry).location);
+			this.freeForm.get('reference').patchValue((data as Entry).reference);
+			this.freeForm.get('designation').patchValue((data as Entry).designation);
+			this.freeForm.get('quantity').patchValue((data as Entry).quantity);
+			this.freeForm.get('status').patchValue((data as Entry).status);
+			this.freeForm.get('commentary').patchValue((data as Entry).commentary);
+			// this.entryIdToEdit = (data as Entry).id; // Id récupéré pour édition
+			// console.log('id', this.entryIdToEdit);
+		});
 	}
 
 	// Méthode d'initialisation du formulaire
@@ -139,8 +158,8 @@ export class FreeFormEntryComponent implements OnInit {
 	filterByFreeRef(ref: string) {
 		this.minLength = 2;
 		if (ref && ref.length >= this.minLength) {
-			let filteredProducts = this.products.filter(term => term.id.toLowerCase().indexOf(ref.toLowerCase()) === 0);
-			// console.log(filteredProducts);
+			let filteredProducts = this.untrackedProducts.filter(term => term.id.toLowerCase().indexOf(ref.toLowerCase()) === 0);
+			// console.log('test', filteredProducts);
 			if (filteredProducts.length > 0) {
 				return filteredProducts.slice(0, 39);
 			}
@@ -152,29 +171,38 @@ export class FreeFormEntryComponent implements OnInit {
 
 	// Méthode de filtrage de la saisie du champ "désignation"
 	filterByFreeDes(des: string) {
-		this.minLength = 4;
+		this.minLength = 3;
 		if (des && des.length >= this.minLength) {
-			let filteredProducts = this.products.filter(term => term.name.toLowerCase().includes(des.toLowerCase()));
-			console.log('FilteredFreeProducts', filteredProducts);
-			if (filteredProducts.length > 0) {
-				return filteredProducts.slice(0, 39);
-			}
-			else {
-				return [];
-			}
+			// this.formEntryService.getProductByFreeDes(des).subscribe(data => {
+			// 	this.filteredProducts = data;
+				// console.log(this.filteredProducts);
+				// console.log(this.filteredProducts.length);
+				// return this.filteredProducts.slice(0, 39);
+				let filteredProducts = this.untrackedProducts.filter(term => term.id.toLowerCase().includes(des.toLowerCase()));
+				// console.log('FilteredFreeProducts', filteredProducts);
+				
+				if (filteredProducts.length > 0) {
+					return filteredProducts.slice(0, 39);
+				}
+				else {
+					return [];
+				}
+			// });
 		}
 	}
 
 	// Crée 1 entrée de stock
-	createFreeEntry(entry): void {
+	saveFreeEntry(entry): void {
 		// console.log(this.freeForm.value);
-		this.formEntryService.addFreeEntry(entry).subscribe();
-		this.initializeFreeForm();
 		if (!this.isInEditMode) {
 			this.verb = 'Ajouter';
+			this.formEntryService.addFreeEntry(entry).subscribe();
+			this.initializeFreeForm();
 		}
 		else if (this.isInEditMode) {
+			this.formEntryService.updateFreeEntry(entry).subscribe();
 			this.isInEditMode = !this.isInEditMode;
+			this.initializeFreeForm();
 		}
 		this.verb = 'Ajouter';
 	}
@@ -183,8 +211,15 @@ export class FreeFormEntryComponent implements OnInit {
 	cancelEdit() {
 		this.isInEditMode = false;
 		this.verb = 'Ajouter';
-		this.freeForm.reset();
-		this.setFocus('freeLoc');
+		this.initializeFreeForm();
+	}
+
+	// Supprime la ligne
+	deleteEdit(entry) {
+		this.formEntryService.deleteFreeEntry(entry).subscribe();
+		this.isInEditMode = false;
+		this.verb = 'Ajouter';
+		this.initializeFreeForm();
 	}
 
 	// Donne le focus à un élément spécifié en argument

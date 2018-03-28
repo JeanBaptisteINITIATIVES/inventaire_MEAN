@@ -6,6 +6,8 @@ import { map } from 'rxjs/operators/map';
 import { MatAutocompleteSelectedEvent } from "@angular/material";
 
 import { FormEntryService } from "../services/form-entry.service";
+import { TableEntryService } from "../services/table-entry.service";
+
 import { RefValidator } from "../validators/ref-validator";
 import { DesValidator } from "../validators/des-validator";
 import { LocValidator } from "../validators/loc-validator";
@@ -24,6 +26,7 @@ export class StockFormEntryComponent implements OnInit {
 	trackedProducts: any[]  = [];
 	locations: any[] = [];
 
+	// entryIdToEdit: number;
 	isInEditMode: boolean = false;
 	verb: string = 'Ajouter';
 	error: any = null;
@@ -36,7 +39,7 @@ export class StockFormEntryComponent implements OnInit {
 	filteredReference$: Observable<any[]>;
 	filteredDesignation$: Observable<any[]>;
 
-	constructor(private formBuilder: FormBuilder, private formEntryService: FormEntryService) { }
+	constructor(private formBuilder: FormBuilder, private formEntryService: FormEntryService, private tableEntryService: TableEntryService) { }
 
 	ngOnInit() {
 		// initialisation du formulaire
@@ -74,16 +77,19 @@ export class StockFormEntryComponent implements OnInit {
 		);
 		
 		// On récupère l'entrée à éditer
-		this.formEntryService.editEntrySubject.subscribe(data => {
+		this.tableEntryService.editStockEntrySubject.subscribe(data => {
 			this.isInEditMode = true;
 			this.verb = 'Modifier';
 			console.log('Entrée à modifier ou supprimer', data);
+			this.stockForm.get('id').patchValue((data as Entry).id);
 			this.stockForm.get('location').patchValue((data as Entry).location);
 			this.stockForm.get('reference').patchValue((data as Entry).reference);
 			this.stockForm.get('designation').patchValue((data as Entry).designation);
 			this.stockForm.get('quantity').patchValue((data as Entry).quantity);
 			this.stockForm.get('status').patchValue((data as Entry).status);
 			this.stockForm.get('commentary').patchValue((data as Entry).commentary);
+			// this.entryIdToEdit = (data as Entry).id; // Id récupéré pour édition
+			// console.log('id', this.entryIdToEdit);
 		});
 	}
 
@@ -186,15 +192,17 @@ export class StockFormEntryComponent implements OnInit {
 	}
 
 	// Crée 1 entrée de stock
-	createStockEntry(entry): void {
+	saveStockEntry(entry): void {
 		// console.log(this.stockForm.value);
-		this.formEntryService.addStockEntry(entry).subscribe();
-		this.initializeForm();
 		if ( !this.isInEditMode ) {
 			this.verb = 'Ajouter';
+			this.formEntryService.addStockEntry(entry).subscribe();
+			this.initializeForm();
 		}
 		else if ( this.isInEditMode ) {
+			this.formEntryService.updateStockEntry(entry).subscribe();
 			this.isInEditMode = !this.isInEditMode;
+			this.initializeForm();
 		}
 		this.verb = 'Ajouter';
 	}
@@ -203,8 +211,15 @@ export class StockFormEntryComponent implements OnInit {
 	cancelEdit() {
 		this.isInEditMode = false;
 		this.verb = 'Ajouter';
-		this.stockForm.reset();
-		this.setFocus('loc');
+		this.initializeForm();
+	}
+
+	// Supprime la ligne
+	deleteEdit(entry) {
+		this.formEntryService.deleteStockEntry(entry).subscribe();
+		this.isInEditMode = false;
+		this.verb = 'Ajouter';
+		this.initializeForm();
 	}
 
 	// Donne le focus à un élément spécifié en argument

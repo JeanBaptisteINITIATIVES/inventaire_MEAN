@@ -11,7 +11,7 @@
 			   matSortActive="date_entry"
 			   matSortDisableClear
 			   matSortDirection="desc">
-		<ng-container matColumnDef="select">
+		<!-- <ng-container matColumnDef="select">
 			<mat-header-cell *matHeaderCellDef>test</mat-header-cell>
 			<mat-cell *matCellDef="let row">
 				<mat-checkbox (click)="$event.stopPropagation()"
@@ -19,7 +19,7 @@
 							  [checked]="selection.isSelected(row)">
 				</mat-checkbox>
 			</mat-cell>
-		</ng-container>
+		</ng-container> -->
 		<ng-container matColumnDef="location">
 			<mat-header-cell *matHeaderCellDef mat-sort-header> Emplacement </mat-header-cell>
 			<mat-cell *matCellDef="let row"> {{ row.location }} </mat-cell>
